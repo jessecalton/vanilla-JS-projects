@@ -24,30 +24,63 @@ function showSuccess(input) {
 }
 
 // Regex check on email string
-function isValidEmail() {
+function checkEmail(input) {
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(email).toLowerCase());
+  if (re.test(input.value.trim())) {
+    showSuccess(input);
+  } else {
+    showError(input, 'Email is not valid');
+  }
 }
 
+// Check for empty inputs
 function checkRequired(inputArr) {
-  inputArr.forEach(function(input) {
-    if(input.value.trim() === '') {
+  inputArr.forEach(function (input) {
+    if (input.value.trim() === '') {
       showError(input, `${getFieldName(input)} is required`);
     } else {
       showSuccess(input);
     }
-  })
+  });
+}
+
+function checkLength(input, min, max) {
+  if (input.value.length < min) {
+    showError(
+      input,
+      `${getFieldName(input)} must be at least ${min} characters`
+    );
+  } else if (input.value.length > max) {
+    showError(
+      input,
+      `${getFieldName(input)} must be less than ${max} characters`
+    );
+  } else {
+    showSuccess(input);
+  }
+}
+
+// Check for matching passwords
+function checkPasswordsMatch(input1, input2) {
+  if (input1.value !== input2.value) {
+    showError(input2, 'Passwords do not match.');
+  }
 }
 
 // Get field name (for error messages)
 function getFieldName(input) {
   // The JS way of capitalizing the first letter.
-  return input.id.charAt(0).toUpperCase() + input.id.slice(1)
+  return input.id.charAt(0).toUpperCase() + input.id.slice(1);
 }
 
 // Event listener for submitting form
-form.addEventListener('submit', function(e) {
+// Calling all the validation methods!
+form.addEventListener('submit', function (e) {
   // Listen for a submit, and do the event
   e.preventDefault();
   checkRequired([username, email, password, password2]);
-})
+  checkLength(username, 3, 15);
+  checkLength(password, 6, 25);
+  checkEmail(email);
+  checkPasswordsMatch(password, password2);
+});
