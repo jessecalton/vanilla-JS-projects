@@ -14,13 +14,11 @@ function searchMeal(e) {
 
   // Get search term
   const term = search.value;
-  console.log(mealsEl);
   // Check for empty search, run fetch if it isn't empty
   if (term.trim()) {
     fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${term}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         resultHeading.innerHTML = `<h2>Search results for ${term}: </h2>`;
 
         // Check for any meals with the search term
@@ -38,6 +36,8 @@ function searchMeal(e) {
             </div> 
           </div>`
               // Adding custom HTML5 attributes, start with `data-`.
+              // We will need this custom attribute to get that specific meal's details
+              // and line it up with the associated meal
             )
             .join(''); // Display this as a string.
         }
@@ -51,3 +51,22 @@ function searchMeal(e) {
 
 // Event listeners
 submit.addEventListener('submit', searchMeal);
+
+// Retrieve the meal's unique ID when it is clicked
+mealsEl.addEventListener('click', (e) => {
+  // .find() returns the first matching child element
+  // This used to be e.path.find() but I couldn't find `.path` in the docs,
+  // so I changed it to `.composedPath()`
+  const mealInfo = e.composedPath().find((item) => {
+    if (item.classList) {
+      return item.classList.contains('meal-info');
+    } else {
+      return false;
+    }
+  });
+  console.log(mealInfo);
+  if (mealInfo) {
+    const mealID = mealInfo.getAttribute('data-mealid');
+    getMealById(mealID);
+  }
+});
