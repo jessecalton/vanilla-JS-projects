@@ -6,14 +6,56 @@ const form = document.getElementById('form');
 const text = document.getElementById('text');
 const amount = document.getElementById('amount');
 
-const dummyTransactions = [
-  { id: 1, text: 'Flower', amount: -20 },
-  { id: 2, text: 'Salary', amount: 300 },
-  { id: 3, text: 'Book', amount: -10 },
-  { id: 4, text: 'Camera', amount: 150 },
-];
+// const dummyTransactions = [
+//   { id: 1, text: 'Flower', amount: -20 },
+//   { id: 2, text: 'Salary', amount: 300 },
+//   { id: 3, text: 'Book', amount: -10 },
+//   { id: 4, text: 'Camera', amount: 150 },
+// ];
 
-let transactions = dummyTransactions;
+// Our local storage
+// Need JSON.parse since it's a stringified array
+const localStorageTransactions = JSON.parse(
+  localStorage.getItem('transactions')
+);
+
+// Check first if anything is in localStorage under the 'transactions' key
+// If not, initialize the value with an empty array
+let transactions =
+  localStorage.getItem('transactions') !== null ? localStorageTransactions : [];
+
+// Add transaction
+function addTransaction(e) {
+  e.preventDefault();
+
+  if (text.value.trim() === '' || amount.value.trim() === '') {
+    alert('Please add a text and amount');
+  } else {
+    const transaction = {
+      id: generateID(),
+      text: text.value,
+      // I always forget the "plus" sign hack to turn a string into a number...
+      amount: +amount.value,
+    };
+    // We can add our new transaction to the array, but still need to run the function to
+    // add it to the DOM
+    transactions.push(transaction);
+    addTransactionDOM(transaction);
+
+    updateValues();
+
+    updateLocalStorage();
+
+    // Don't forget to clear the values!
+    text.value = '';
+    amount.value = '';
+  }
+}
+
+// Generate random ID
+function generateID() {
+  return Math.floor(Math.random() * 1000000000);
+}
 
 // Add transactions to DOM list
 function addTransactionDOM(transaction) {
@@ -28,7 +70,9 @@ function addTransactionDOM(transaction) {
   // Make the innerHTML use the absolute value to strip off any "-" signs
   item.innerHTML = `
     ${transaction.text} <span>${sign}${Math.abs(transaction.amount)}</span>
-    <button class="delete-btn"></button>
+    <button class="delete-btn" onclick="removeTransaction(${
+      transaction.id
+    })">x</button>
   `;
 
   list.appendChild(item);
@@ -57,6 +101,13 @@ function updateValues() {
   money_minus.innerText = `$${expense}`;
 }
 
+// Remove transaction by ID
+function removeTransaction(id) {
+  transactions = transactions.filter((transaction) => transaction.id !== id);
+  updateLocalStorage();
+  init();
+}
+
 // Init app
 function init() {
   // Clear out the list
@@ -67,4 +118,12 @@ function init() {
   updateValues();
 }
 
+// Update local storage transactions
+function updateLocalStorage() {
+  // Gotta stringify it before it gets sent!
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+}
+
 init();
+
+form.addEventListener('submit', addTransaction);
