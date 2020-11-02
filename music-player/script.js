@@ -32,6 +32,7 @@ function playSong() {
   playBtn.querySelector('i.fas').classList.remove('fa-play');
   playBtn.querySelector('i.fas').classList.add('fa-pause');
 
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play
   audio.play();
 }
 // pause song
@@ -42,6 +43,52 @@ function pauseSong() {
   playBtn.querySelector('i.fas').classList.remove('fa-pause');
 
   audio.pause();
+}
+
+// Previous song
+function prevSong() {
+  songIndex--;
+
+  if (songIndex < 0) {
+    songIndex = songs.length - 1;
+  }
+
+  loadSong(songs[songIndex]);
+  playSong();
+}
+
+// Next song
+function nextSong() {
+  songIndex++;
+
+  // If it's greater than the "last" index, reset it to 0
+  if (songIndex > songs.length - 1) {
+    songIndex = 0;
+  }
+
+  loadSong(songs[songIndex]);
+  playSong();
+}
+
+// Update progress bar
+function updateProgress(e) {
+  // Get the duration and current time from source element
+  const { duration, currentTime } = e.srcElement;
+  const progressPercent = (currentTime / duration) * 100;
+  // All you need to do to change the progress bar is adjust the width!
+  progress.style.width = `${progressPercent}%`;
+}
+
+// Set the progress bar
+function setProgress(e) {
+  // Get the total width of the clicked object
+  const width = this.clientWidth;
+  // offsetX is where you clicked
+  const clickX = e.offsetX;
+  // Get the full duration of the song playing
+  const duration = audio.duration;
+
+  audio.currentTime = (clickX / width) * duration;
 }
 
 // Event listeners
@@ -55,3 +102,15 @@ playBtn.addEventListener('click', () => {
     playSong();
   }
 });
+
+prevBtn.addEventListener('click', prevSong);
+nextBtn.addEventListener('click', nextSong);
+
+// Time/song update
+audio.addEventListener('timeupdate', updateProgress);
+
+// Clicking on the progress bar
+progressContainer.addEventListener('click', setProgress);
+
+// Song ends, player goes to next song
+audio.addEventListener('ended', nextSong);
