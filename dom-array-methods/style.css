@@ -13,7 +13,7 @@ body {
 }
 
 .container {
-  /* Aligns the sidebar and the main area horizontally */
+  /* Aligns the aside and the main area horizontally */
   display: flex;
   padding: 20px;
   margin: 0 auto;
