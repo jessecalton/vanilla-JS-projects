@@ -41,6 +41,13 @@ let score = 0;
 // Init time
 let time = 10;
 
+// Focus on text input upon page load
+text.focus();
+
+// Start counting down
+// Every second, it calls the updateTime method
+const timeInterval = setInterval(updateTime, 1000);
+
 // Generate a random word from word array
 function getRandomWord() {
   return words[Math.floor(Math.random() * words.length)];
@@ -58,6 +65,31 @@ function updateScore() {
   scoreEl.innerHTML = score;
 }
 
+// Update time
+function updateTime() {
+  time--;
+  timeEl.innerHTML = time + 's';
+
+  if (time === 0) {
+    // Stops the timer
+    clearInterval(timeInterval);
+    // Ends the game
+    gameOver();
+  }
+}
+
+// Game over, show end screen
+// The location.reload() function is a window method that reloads the page
+function gameOver() {
+  endgameEl.innerHTML = `
+    <h1>Time ran out</h1>
+    <p>Your final score is ${score}</p>
+    <button onclick="location.reload()">Reload!</button>
+  `;
+
+  endgameEl.style.display = 'flex';
+}
+
 addWordToDOM();
 
 // Event Listeners
@@ -70,6 +102,9 @@ text.addEventListener('input', (e) => {
 
     // Clear the input
     e.target.value = '';
-  } else {
+
+    time += 5;
+
+    updateTime();
   }
 });

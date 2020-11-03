@@ -113,6 +113,8 @@ of the .container class */
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  /* This is how we position it directly over the play screen
+  when it's game over, man. */
   position: absolute;
   top: 0;
   left: 0;
