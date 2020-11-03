@@ -70,7 +70,73 @@ function createBox(item) {
     <p class="info">${text}</p>
   `;
 
-  // @todo - speak event
+  box.addEventListener('click', () => {
+    setTextMessage(text);
+    speakText();
+
+    // Add the .active class, removes it after 800ms
+    box.classList.add('active');
+    setTimeout(() => box.classList.remove('active'), 800);
+  });
 
   main.appendChild(box);
 }
+
+// Init speech synth
+const message = new SpeechSynthesisUtterance();
+
+// Store voices
+let voices = [];
+
+function getVoices() {
+  voices = speechSynthesis.getVoices();
+
+  voices.forEach((voice) => {
+    const option = document.createElement('option');
+    option.value = voice.name;
+    option.innerText = `${voice.name} ${voice.lang}`;
+    voicesSelect.appendChild(option);
+  });
+}
+
+// Set text to be spoken
+function setTextMessage(text) {
+  message.text = text;
+}
+
+// Speak the text set in the setTextMessage func
+function speakText() {
+  speechSynthesis.speak(message);
+}
+
+// Set the voice
+function setVoice(e) {
+  // Finds the voice that was selected in the voices dropdown,
+  // sets the SpeechSynthesisUtterance to that voice
+  message.voice = voices.find((voice) => voice.name === e.target.value);
+}
+
+// For some reason we need this event listener to populate the
+// `voices` array
+speechSynthesis.addEventListener('voiceschanged', getVoices);
+
+// Toggle text box
+toggleBtn.addEventListener('click', () =>
+  document.getElementById('text-box').classList.toggle('show')
+);
+
+// Close button text box
+closeBtn.addEventListener('click', () =>
+  document.getElementById('text-box').classList.remove('show')
+);
+
+// Change the speaking voice for the talking API
+voicesSelect.addEventListener('change', setVoice);
+
+// Read text button
+readBtn.addEventListener('click', () => {
+  setTextMessage(textarea.value);
+  speakText();
+});
+
+getVoices();
