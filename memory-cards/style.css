@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  /* No scrollbars if the content don't fit */
+  overflow: hidden;
+  font-family: 'Lato', sans-serif;
+}
+
+/* The buttons are within the H1, so we need relative positioning */
+h1 {
+  position: relative;
+}
+
+h1 button {
+  position: absolute;
+  right: 0;
+  /* Without transform, it would sit on top of the h1 text */
+  transform: translate(120%, -50%);
+  z-index: 2;
+}
+
+.btn {
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 20px;
+  background-color: #fff;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  padding: 10px 15px;
+}
+
+/* for the slightly smaller buttons */
+.btn-small {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+/* No border, no background */
+.btn-ghost {
+  border: 0;
+  background-color: transparent;
+}
+
+/* Positions the "clear cards" button down to the bottom */
+.clear {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+}
