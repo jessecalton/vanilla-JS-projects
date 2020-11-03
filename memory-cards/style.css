@@ -75,12 +75,22 @@ h1 button {
   left: 0;
   height: 100%;
   width: 100%;
+  /* This is the "start" of the flippy effect, puts it off-kilter */
+  transform: translateX(50%) rotateY(-10deg);
+  transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
 .card.active {
   cursor: pointer;
   opacity: 1;
   z-index: 10;
+  /* This is the default, the "end" of the effect */
+  transform: translateX(0) rotateY(0deg);
+}
+
+.card.left {
+  /* Same transform as above, just the opposite side */
+  transform: translateX(-50%) rotateY(10deg);
 }
 
 .inner-card {
@@ -90,10 +100,19 @@ h1 button {
   width: 100%;
   /* inner card front and inner card back will be absolute position */
   position: relative;
+  /* This preserves the element in its own space */
+  transform-style: preserve-3d;
+  /* Adding the flip effect */
+  transition: transform 0.4s ease;
+}
+
+.card.show-answer .inner-card {
+  transform: rotateX(180deg);
 }
 
 .inner-card-front,
 .inner-card-back {
+  backface-visibility: hidden;
   position: absolute;
   top: 0;
   left: 0;
@@ -104,5 +123,88 @@ h1 button {
   will not work */
   height: 100%;
   width: 100%;
+  /* With background, you don't see the card "behind" it. */
   background: #fff;
+}
+
+.inner-card-front {
+  transform: rotateX(0deg);
+  z-index: 2;
+}
+
+.inner-card-back {
+  transform: rotateX(180deg);
+}
+
+/* Adding the font-awesome icon ::after the element's content */
+.inner-card-front::after,
+.inner-card-back::after {
+  /* add font-awesome content to element */
+  content: '\f021  Flip';
+  font-family: 'Font Awesome 5 Free', 'Lato', sans-serif;
+  /*  */
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #ddd;
+}
+
+.navigation {
+  display: flex;
+  margin: 20px 0;
+}
+
+.navigation .nav-button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.navigation p {
+  margin: 0 25px;
+}
+
+/* Thanks to absolute positioning, this will sit on top of the cards */
+.add-container {
+  opacity: 0;
+  background-color: #f0f0f0;
+  border-top: 2px solid #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: -1;
+  transition: 0.3s ease;
+}
+
+.add-container.show {
+  opacity: 1;
+  z-index: 2;
+}
+
+.add-container h3 {
+  margin: 10px 0;
+}
+
+/* I probably would've used flexbox, but this is much cleaner */
+.form-group label {
+  display: block;
+  margin: 20px 0 10px;
+}
+
+.form-group textarea {
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  font-size: 16px;
+  padding: 12px;
+  min-width: 500px;
+  max-width: 100%;
 }
