@@ -52,7 +52,7 @@ button:focus {
   align-items: center;
   justify-content: center;
 
-  /* Doing something with the button */
+  /* To be toggled with the `.hide` class */
   transform: translateY(0);
   /* -100% will hide it */
   transition: transform 0.3s ease-in-out;
