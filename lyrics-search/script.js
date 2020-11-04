@@ -72,9 +72,28 @@ function showData(data) {
 
 // Gets previous or next batch of songs
 async function getMoreSongs(url) {
+  // Need this to bypass CORS
   const res = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
   const data = await res.json();
   showData(data);
+}
+
+// Get the song lyrics
+async function getLyrics(artist, songTitle) {
+  const res = await fetch(`${apiURL}/v1/${artist}/${songTitle}`);
+  const data = await res.json();
+
+  // Regex to find line breaks and carriage returns.
+  // The "g" is global, and it won't only replace the first match
+  const lyrics = data.lyrics.replace(/(\r\n|\r|\n)/g, `<br>`);
+
+  result.innerHTML = `
+    <h2><strong>${artist}</strong> - ${songTitle}</h2>
+    <span>${lyrics}</span>
+  `;
+
+  // Clear this div in case there's "next" or "prev" button
+  more.innerHTML = '';
 }
 
 // Event listeners
@@ -87,5 +106,19 @@ form.addEventListener('submit', (e) => {
     alert('Please type a search term');
   } else {
     searchSongs(searchTerm);
+  }
+});
+
+// Get lyrics button click
+// `result` is the entire div of returned songs. `e.target` gets us the
+// button that was clicked
+result.addEventListener('click', (e) => {
+  const clickedEl = e.target;
+
+  if (clickedEl.tagName === 'BUTTON') {
+    const artist = clickedEl.getAttribute('data-artist');
+    const songTitle = clickedEl.getAttribute('data-songtitle');
+
+    getLyrics(artist, songTitle);
   }
 });
