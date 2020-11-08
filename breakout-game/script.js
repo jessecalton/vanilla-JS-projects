@@ -116,10 +116,76 @@ function movePaddle() {
   }
 }
 
+// Move ball on canvas
+function moveBall() {
+  ball.x += ball.dx;
+  ball.y += ball.dy;
+
+  // Wall collision detection (right/left)
+  if (ball.x + ball.size > canvas.width || ball.x - ball.size < 0) {
+    ball.dx *= -1; // ball.dx = ball.dx * -1
+  }
+
+  // Wall collision (top/bottom)
+  if (ball.y + ball.size > canvas.height || ball.y - ball.size < 0) {
+    ball.dy *= -1;
+  }
+
+  // Paddle collision
+  if (
+    ball.x - ball.size > paddle.x &&
+    ball.x + ball.size < paddle.x + paddle.w &&
+    ball.y + ball.size > paddle.y
+  ) {
+    ball.dy = -ball.speed;
+  }
+
+  // Brick collision
+  bricks.forEach((column) => {
+    column.forEach((brick) => {
+      if (brick.visible) {
+        if (
+          ball.x - ball.size > brick.x && // left brick side check
+          ball.x + ball.size < brick.x + brick.w && // right brick side check
+          ball.y + ball.size > brick.y && // top brick side check
+          ball.y - ball.size < brick.y + brick.h // bottom brick side check
+        ) {
+          ball.dy *= -1;
+          brick.visible = false;
+
+          increaseScore();
+        }
+      }
+    });
+  });
+
+  // Hit bottom wall and lose
+  if (ball.y + ball.size > canvas.height) {
+    showAllBricks();
+    score = 0;
+  }
+}
+
+// Increase score
+function increaseScore() {
+  score++;
+
+  if (score % (brickRowCount * brickRowCount === 0)) {
+    showAllBricks();
+  }
+}
+
+function showAllBricks() {
+  bricks.forEach((column) => {
+    column.forEach((brick) => (brick.visible = true));
+  });
+}
+
 // Draw all the things
 function draw() {
-  // clear the entire width (for when you move the paddle)
+  // clear the entire width first (for when you move the paddle)
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Then draw the stuff
   drawBall();
   drawPaddle();
   drawScore();
@@ -129,6 +195,8 @@ function draw() {
 // Update canvas drawing and animation
 function update() {
   movePaddle();
+  moveBall();
+
   // Draw everything
   draw();
 
@@ -137,7 +205,7 @@ function update() {
 
 update();
 
-// Keydown event
+// Keydown event, for pressing the key and moving the paddle
 function keyDown(e) {
   if (e.key === 'Right' || e.key === 'ArrowRight') {
     paddle.dx = paddle.speed;
@@ -146,7 +214,7 @@ function keyDown(e) {
   }
 }
 
-// KeyUp event
+// KeyUp event, for when you release the key and stop moving the paddle
 function keyUp(e) {
   if (
     e.key === 'Right' ||
