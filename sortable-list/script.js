@@ -49,4 +49,81 @@ function createList() {
 
       draggable_list.appendChild(listItem);
     });
+  addEventListeners();
 }
+
+function dragStart() {
+  // console.log('Event: ', 'dragstart');
+
+  // `dragStartIndex` is set at top level
+  // Get our custom attribute from the `closest` <li>
+  dragStartIndex = +this.closest('li').getAttribute('data-index');
+}
+function dragEnter() {
+  // console.log('Event: ', 'dragEnter');
+
+  // `this` pertains to the element
+  this.classList.add('over');
+}
+function dragLeave() {
+  // console.log('Event: ', 'dragleave');
+  this.classList.remove('over');
+}
+function dragOver(e) {
+  console.log('Event: ', 'dragover');
+
+  // We need the `preventDefault` here so the `drop` event gets recognized.
+  // Otherwise, it would be blocked
+  e.preventDefault();
+}
+function dragDrop() {
+  // console.log('Event: ', 'drop');
+
+  const dragEndIndex = +this.getAttribute('data-index');
+  swapItems(dragStartIndex, dragEndIndex);
+
+  this.classList.remove('over');
+}
+
+// Swaps list items when they are dragged and dropped
+function swapItems(fromIndex, toIndex) {
+  const itemOne = listItems[fromIndex].querySelector('.draggable');
+  const itemTwo = listItems[toIndex].querySelector('.draggable');
+
+  // This will do the swapping, and additional nodes won't be created.
+  listItems[fromIndex].appendChild(itemTwo);
+  listItems[toIndex].appendChild(itemOne);
+}
+
+// Checks the order of list items
+function checkOrder() {
+  listItems.forEach((listItem, index) => {
+    const personName = listItem.querySelector('.draggable').innerText.trim();
+
+    if (personName !== richestPeople[index]) {
+      listItem.classList.add('wrong');
+    } else {
+      listItem.classList.remove('wrong');
+      listItem.classList.add('right');
+    }
+  });
+}
+
+function addEventListeners() {
+  // Many different drag events: https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
+  const draggables = document.querySelectorAll('.draggable');
+  const dragListItem = document.querySelectorAll('.draggable-list li');
+
+  draggables.forEach((draggable) => {
+    draggable.addEventListener('dragstart', dragStart);
+  });
+
+  dragListItem.forEach((item) => {
+    item.addEventListener('dragover', dragOver);
+    item.addEventListener('drop', dragDrop);
+    item.addEventListener('dragenter', dragEnter);
+    item.addEventListener('dragleave', dragLeave);
+  });
+}
+
+check.addEventListener('click', checkOrder);
